@@ -1,15 +1,32 @@
 import datetime
+import logging
 import threading
 import time
 
+from router import Router
+
 
 class Host:
-    def send(self, data, link):  # send the data
-        data.startdeparureTimeFromHost = datetime.datetime.now()
-        transmission_time = data.size / link.debit
-        print(f"Transmission time: {transmission_time}")
-        data.enddeparureTimeFromHost = data.startdeparureTimeFromHost + datetime.timedelta(seconds=transmission_time)
-        print(f"Packet start departure time from host: {data.startdeparureTimeFromHost} and end at {data.enddeparureTimeFromHost}")
+
+    previous_packet = None
+
+    def send(self, packet, link, router):  # send the data
+
+        transmission_time = packet.size / link.debit
+
+        if self.previous_packet is None:
+            packet.startDepartureTimeFromHost = datetime.datetime.now()
+
+        else:
+            packet.startDepartureTimeFromHost = self.previous_packet.endDepartureTimeFromHost
+
+        packet.endDepartureTimeFromHost = packet.startDepartureTimeFromHost + datetime.timedelta(seconds=transmission_time)
+
+        self.previous_packet = packet
+
+        packet = router.recv(packet, link)
+
+        return packet
 
 
     def recv(self):  # receive the data

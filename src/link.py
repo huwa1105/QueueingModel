@@ -4,8 +4,14 @@ tp = the time taken to cover this distance in meters per second
 time of transmission : t = L/R where L = the packet size in Bits and
  R = the transmission rate in Bits per second
 """
+import time
+
 
 class Link:
     distance: int  # in meters
     speed: int = 200000  # m/s, 2/3 of speed of light
     debit: int   # the debit is in bits/s
+
+    def propagation(self):
+        propagation_time = self.distance / self.speed
+        return propagation_time

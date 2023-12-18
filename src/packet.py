@@ -8,9 +8,9 @@ class Packet:
     positionInQueue: int | None = None  # the position in the queue of the router
     startDepartureTimeFromHost: datetime | None = None  # the time of departure from the hostA
     endDepartureTimeFromHost: datetime | None = None  # the time of departure from the hostA
-    startarrivalTimeToRouter: datetime | None = None  # the time of arrival at the router
-    endarrivalTimeToRouter: datetime | None = None  # the time of arrival at the router
-    startdepartureTimeFromRouter: datetime | None = None  # the time of departure from the router
-    enddepartureTimeFromRouter: datetime | None = None  # the time of departure from the router
-    startarrivalTimeToDestination: datetime | None = None  # the time of arrival at the hostB
-    endarrivalTimeToDestination: datetime | None = None  # the time of arrival at the hostB
+    startArrivalTimeToRouter: datetime | None = None  # the time of arrival at the router
+    endArrivalTimeToRouter: datetime | None = None  # the time of arrival at the router
+    startDepartureTimeFromRouter: datetime | None = None  # the time of departure from the router
+    endDepartureTimeFromRouter: datetime | None = None  # the time of departure from the router
+    startArrivalTimeToDestination: datetime | None = None  # the time of arrival at the hostB
+    endArrivalTimeToDestination: datetime | None = None  # the time of arrival at the hostB

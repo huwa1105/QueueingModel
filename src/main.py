@@ -1,11 +1,11 @@
 import time
-from pprint import pprint
 import threading
+import logging
 
-from src.router import Router
-from src.link import Link
-from src.host import Host
-from src.packet import Packet
+from router import Router
+from link import Link
+from host import Host
+from packet import Packet
 
 
 def main():
@@ -18,7 +18,7 @@ def main():
 
     # Create router
     router = Router()
-    router.queue_size = 1000
+    router.queue_size_in_octets = 500
 
     # Create links
     linkAR = Link()
@@ -29,7 +29,6 @@ def main():
     linkRB.distance = 1000
     linkRB.debit = 1000000
 
-
     # Packets generation
     def generate_packet():
         i = 0
@@ -38,14 +37,13 @@ def main():
             time.sleep(1)
             packet = Packet(i, 1000, 0, False, None, None, None, None)
             event_list.append(packet)
-            print("Packet generated")
+            logging.info(f"Packet {i} generated")
 
     t_packet = threading.Thread(target=generate_packet, name="packet_generation")
 
-    # for i in range(1, 10):
-    #     packet = Packet(order=i, size=1000, dropped=False)
-    #     event_list.append(packet)
-    #     print("Packet generated")
+    for i in range(0, 10):
+        packet = Packet(order=i, size=1000, dropped=False)
+        event_list.append(packet)
 
     # Send packets
 
@@ -53,13 +51,15 @@ def main():
         while True:
             if len(event_list) > 0:
                 packet = event_list.pop(0)
-                hostA.send(packet, linkAR)
-                print("Packet sent")
-            time.sleep(1)
+                sent_packet = hostA.send(packet, linkAR, router)
+                print(f"Packet {sent_packet} sent from HostA to Router")
+
+
+
 
     t_send = threading.Thread(target=send_packet, name="packet_sending")
 
-    t_packet.start()
+    #t_packet.start()
     t_send.start()
 
 
