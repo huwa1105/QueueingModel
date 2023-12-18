@@ -8,26 +8,18 @@ from router import Router
 
 class Host:
 
-    previous_packet = None
+    def send(self, packet, link):  # send the data
 
-    def send(self, packet, link, router):  # send the data
+        packet.startDepartureTimeFromHost = datetime.datetime.now()
 
-        transmission_time = packet.size / link.debit
+        link.transmission(packet)
 
-        if self.previous_packet is None:
-            packet.startDepartureTimeFromHost = datetime.datetime.now()
-
-        else:
-            packet.startDepartureTimeFromHost = self.previous_packet.endDepartureTimeFromHost
-
-        packet.endDepartureTimeFromHost = packet.startDepartureTimeFromHost + datetime.timedelta(seconds=transmission_time)
-
-        self.previous_packet = packet
-
-        packet = router.recv(packet, link)
+        packet.endDepartureTimeFromHost = datetime.datetime.now()
 
         return packet
 
 
-    def recv(self):  # receive the data
-        return "data"
+    def recv(self, packet, link):  # receive the data
+        packet.startArrivalTimeToDestination = datetime.datetime.now()
+        packet.endArrivalTimeToDestination = datetime.datetime.now()
+        return packet
