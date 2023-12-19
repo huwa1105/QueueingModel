@@ -13,13 +13,15 @@ class Link:
     debit: int   # the debit is in bits/s
 
     def propagation(self):
+
         propagation_time = self.distance / self.speed
-        #print(f"Propagation time: {propagation_time}")
+        # print(f"Propagation time: {propagation_time}")
         time.sleep(propagation_time)
         return propagation_time
 
     def transmission(self, packet):
+
         transmission_time = packet.size / self.debit
-        #print(f"Transmission time: {transmission_time}")
+        # print(f"Transmission time: {transmission_time}")
         time.sleep(transmission_time)
         return transmission_time

@@ -8,6 +8,7 @@ from link import Link
 from host import Host
 from packet import Packet
 
+
 # TODO Assure sync for shared list between threads
 # TODO Find a way to display result
 
@@ -30,12 +31,12 @@ def main():
 
     # Create links
     linkAR = Link()
-    linkAR.distance = 200
-    linkAR.debit = 5000
+    linkAR.distance = 20000
+    linkAR.debit = 10000
 
     linkRB = Link()
-    linkRB.distance = 200
-    linkRB.debit = 1000
+    linkRB.distance = 40000
+    linkRB.debit = 7500
 
     # Packets generation
     def generate_packet():
@@ -48,7 +49,7 @@ def main():
 
     t_packet = threading.Thread(target=generate_packet, name="packet_generation")
 
-    for i in range(0, 1000):
+    for i in range(0, 100):
         packet = Packet(order=i, size=1000, dropped=False)
         event_list.append(packet)
 
@@ -60,6 +61,8 @@ def main():
                 sent_packet = hostA.send(sent_packet, linkAR)
                 # print(f"\nPacket {sent_packet} sent by host")
                 sent_packets_linkAR.append(sent_packet)
+            elif len(event_list) == 0 and len(router.queue) == 0 and len(sent_packets_linkAR) == 0 and len(sent_packets_linkRB) == 0:
+                break
 
     def router_recv_packet():
         while True:
@@ -69,6 +72,8 @@ def main():
                 if dropped_packet:
                     all_packets_result.append(dropped_packet)
                 # print(f"\nPacket {received_packet} received by router")
+            elif len(event_list) == 0 and len(router.queue) == 0 and len(sent_packets_linkAR) == 0 and len(sent_packets_linkRB) == 0:
+                break
 
     def router_send_packet():
         while True:
@@ -77,6 +82,8 @@ def main():
                 sent_packet = router.send(sent_packet, linkRB)
                 # print(f"\nPacket {sent_packet} sent by router")
                 sent_packets_linkRB.append(sent_packet)
+            elif len(event_list) == 0 and len(router.queue) == 0 and len(sent_packets_linkAR) == 0 and len(sent_packets_linkRB) == 0:
+                break
 
     def host_recv_packet():
         while True:
@@ -85,6 +92,12 @@ def main():
                 hostB.recv(received_packet, linkRB)
                 all_packets_result.append(received_packet)
                 print(f"\nPacket {received_packet} received by hostB")
+            elif len(event_list) == 0 and len(router.queue) == 0 and len(sent_packets_linkAR) == 0 and len(sent_packets_linkRB) == 0:
+                print("\nAll packets have been sent and received\n")
+                break
+        all_packets_result.sort(key=lambda x: x.order)
+        for element in all_packets_result:
+            print(f"{element.order}\t{element.startDepartureTimeFromHost}\t{element.endArrivalTimeToRouter}\t{element.startDepartureTimeFromRouter}\t{element.endArrivalTimeToDestination}\t{element.positionInQueue}\t{element.dropped}")
 
     t_host_send = threading.Thread(target=host_send_packet, name="host_packet_sending")
     t_router_recv = threading.Thread(target=router_recv_packet, name="router_packet_receiving")
