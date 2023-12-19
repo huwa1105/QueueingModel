@@ -1,7 +1,8 @@
+import os
 import time
 import threading
 import logging
-from pprint import pprint
+import toml
 
 from router import Router
 from link import Link
@@ -10,13 +11,21 @@ from packet import Packet
 
 
 # TODO Assure sync for shared list between threads
-# TODO Find a way to display result
 
 
 def main():
+
+    config_file = "case1.toml"
+
+    with open(config_file, "r") as f:
+        config = toml.load(f)
+
     # Util_variables
     event_list = []
     all_packets_result = []
+    rate: int = int(config['parameter']['rate'])  # packets per second
+    global flag
+    flag = False
 
     sent_packets_linkAR = []
     sent_packets_linkRB = []
@@ -27,74 +36,79 @@ def main():
 
     # Create router
     router = Router()
-    router.queue_size_in_octets = 1000
+    router.queue_size_in_octets = int(config['parameter']['queue_size'])
 
     # Create links
     linkAR = Link()
-    linkAR.distance = 20000
-    linkAR.debit = 10000
+    linkAR.distance = int(config['parameter']['distance_link_1'])
+    linkAR.debit = int(config['parameter']['debit_link_1'])
+    linkAR.speed = int(config['parameter']['speed'])
 
     linkRB = Link()
-    linkRB.distance = 40000
-    linkRB.debit = 7500
+    linkRB.distance = int(config['parameter']['distance_link_2'])
+    linkRB.debit = int(config['parameter']['debit_link_2'])
+    linkRB.speed = int(config['parameter']['speed'])
 
     # Packets generation
     def generate_packet():
-        i = 0
-        while True:
-            i += 1
-            packet = Packet(i, 1000, 0, False, None, None, None, None)
+        global flag
+        for i in range(0, int(config['parameter']['number_of_packets'])):
+            packet = Packet(order=i, size=1000, dropped=False)
             event_list.append(packet)
-            # print(f"Packet {i} generated")
+            time.sleep(1 / rate)
+
+        #print("\nAll packets have been generated\n")
+        flag = True
 
     t_packet = threading.Thread(target=generate_packet, name="packet_generation")
 
-    for i in range(0, 100):
-        packet = Packet(order=i, size=1000, dropped=False)
-        event_list.append(packet)
-
     # Send packets
     def host_send_packet():
-        while True:
-            if len(event_list) > 0:
+        cmpt =0
+        while cmpt < int(config['parameter']['number_of_packets']):
+            if event_list:
+                cmpt += 1
                 sent_packet = event_list.pop(0)
                 sent_packet = hostA.send(sent_packet, linkAR)
                 # print(f"\nPacket {sent_packet} sent by host")
                 sent_packets_linkAR.append(sent_packet)
-            elif len(event_list) == 0 and len(router.queue) == 0 and len(sent_packets_linkAR) == 0 and len(sent_packets_linkRB) == 0:
-                break
+        print(f"\nAll packets have been sent by host {cmpt}")
 
     def router_recv_packet():
-        while True:
-            if len(sent_packets_linkAR) > 0:
+        cmpt = 0
+        while cmpt < int(config['parameter']['number_of_packets']):
+            if sent_packets_linkAR:
+                cmpt += 1
                 received_packet = sent_packets_linkAR.pop(0)
                 dropped_packet = router.recv(received_packet, linkAR)
                 if dropped_packet:
                     all_packets_result.append(dropped_packet)
                 # print(f"\nPacket {received_packet} received by router")
-            elif len(event_list) == 0 and len(router.queue) == 0 and len(sent_packets_linkAR) == 0 and len(sent_packets_linkRB) == 0:
-                break
+        print(f"\nAll packets have been received by router {cmpt}")
+
 
     def router_send_packet():
-        while True:
-            if len(router.queue) > 0:
+        cmpt = 0
+        while cmpt < int(config['parameter']['number_of_packets']) - router.dropped_count:
+            if router.queue:
+                cmpt += 1
                 sent_packet = router.queue.pop(0)
                 sent_packet = router.send(sent_packet, linkRB)
                 # print(f"\nPacket {sent_packet} sent by router")
                 sent_packets_linkRB.append(sent_packet)
-            elif len(event_list) == 0 and len(router.queue) == 0 and len(sent_packets_linkAR) == 0 and len(sent_packets_linkRB) == 0:
-                break
+        print(f"\nAll packets have been sent by router {cmpt}")
+
 
     def host_recv_packet():
-        while True:
-            if len(sent_packets_linkRB) > 0:
+        cmpt = 0
+        while cmpt < int(config['parameter']['number_of_packets']) - router.dropped_count:
+            if sent_packets_linkRB:
+                cmpt += 1
                 received_packet = sent_packets_linkRB.pop(0)
                 hostB.recv(received_packet, linkRB)
                 all_packets_result.append(received_packet)
-                print(f"\nPacket {received_packet} received by hostB")
-            elif len(event_list) == 0 and len(router.queue) == 0 and len(sent_packets_linkAR) == 0 and len(sent_packets_linkRB) == 0:
-                print("\nAll packets have been sent and received\n")
-                break
+                print(f"\nPacket {received_packet} received by host")
+        print(f"\nAll packets have been received by host {cmpt}\n")
         all_packets_result.sort(key=lambda x: x.order)
         for element in all_packets_result:
             print(f"{element.order}\t{element.startDepartureTimeFromHost}\t{element.endArrivalTimeToRouter}\t{element.startDepartureTimeFromRouter}\t{element.endArrivalTimeToDestination}\t{element.positionInQueue}\t{element.dropped}")
@@ -104,11 +118,17 @@ def main():
     t_router_send = threading.Thread(target=router_send_packet, name="router_packet_sending")
     t_host_recv = threading.Thread(target=host_recv_packet, name="host_packet_receiving")
 
-    # t_packet.start()
+    t_packet.start()
     t_host_send.start()
     t_router_recv.start()
     t_router_send.start()
     t_host_recv.start()
+
+    t_packet.join()
+    t_host_send.join()
+    t_router_recv.join()
+    t_router_send.join()
+    t_host_recv.join()
 
 
 if __name__ == "__main__":

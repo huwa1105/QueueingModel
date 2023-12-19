@@ -1,4 +1,5 @@
 import datetime
+from threading import Lock
 
 
 class Router:
@@ -6,16 +7,16 @@ class Router:
     queue = []
     sum_of_packets_size_in_queue = 0
     dropped_count = 0
+    queue_size = queue_size_in_octets * 8  # the queue is in bits
+
 
     def recv(self, packet, link):
-
-        queue_size = self.queue_size_in_octets * 8  # the queue is in bits
         packet.startArrivalTimeToRouter = datetime.datetime.now()
         propagation_time = link.propagation()
         packet.endArrivalTimeToRouter = packet.endDepartureTimeFromHost + datetime.timedelta(seconds=propagation_time)
         packet.positionInQueue = len(self.queue) + 1
 
-        if (packet.size + self.sum_of_packets_size_in_queue) <= queue_size:
+        if (packet.size + self.sum_of_packets_size_in_queue) <= self.queue_size:
             packet.dropped = False
             self.queue.append(packet)
             self.sum_of_packets_size_in_queue += packet.size
@@ -25,7 +26,6 @@ class Router:
             return packet
 
     def send(self, packet, link):
-
         packet.startDepartureTimeFromRouter = datetime.datetime.now()
         link.transmission(packet)
         packet.endDepartureTimeFromRouter = datetime.datetime.now()

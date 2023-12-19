@@ -9,7 +9,7 @@ import time
 
 class Link:
     distance: int  # in meters
-    speed: int = 200000  # m/s, 2/3 of speed of light
+    speed: int  # m/s, 2/3 of speed of light
     debit: int   # the debit is in bits/s
 
     def propagation(self):
