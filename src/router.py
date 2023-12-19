@@ -6,7 +6,6 @@ import time
 class Router:
     queue_size_in_octets: int = 1000  # the queue is in octets
     queue = []
-    dropped_packets = []
     sum_of_packets_size_in_queue = 0
     dropped_count = 0
 
@@ -28,19 +27,18 @@ class Router:
             self.sum_of_packets_size_in_queue += packet.size
         else:
             packet.dropped = True
-            self.dropped_packets.append(packet)
             self.dropped_count += 1
+            return packet
 
-        return self.queue
 
     def send(self, packet, link):
-        if len(self.queue) > 0:
 
-            packet.startDepartureTimeFromRouter = datetime.datetime.now()
+        packet.startDepartureTimeFromRouter = datetime.datetime.now()
 
-            link.transmission(packet)
-            packet.endDepartureTimeFromRouter = datetime.datetime.now()
+        link.transmission(packet)
 
-            self.sum_of_packets_size_in_queue -= packet.size
+        packet.endDepartureTimeFromRouter = datetime.datetime.now()
 
-            return packet
+        self.sum_of_packets_size_in_queue -= packet.size
+
+        return packet
