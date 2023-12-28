@@ -57,7 +57,6 @@ def main():
         if float(rate) == rate:
 
             new_rate = float(rate)
-
             print(f"\n{rate} packets per second")
 
             for i in range(0, int(config['parameter']['number_of_packets'])):

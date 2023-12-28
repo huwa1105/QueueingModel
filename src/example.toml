@@ -5,5 +5,5 @@ debit_link_1 = 1000 #bits/s
 distance_link_1 = 200000 #distance in meters
 debit_link_2 = 500 #bits/s
 distance_link_2 = 400000 #distance in meters
-number_of_packets = 50 #number of packets to send
+number_of_packets = 30 #number of packets to send
 speed = 200000 #bits/s (2/3 of speed of light)
