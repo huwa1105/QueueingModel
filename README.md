@@ -1,38 +1,63 @@
-# Packet Routing Simulation
+# Queueing Model
 
-This project simulates the process of packet routing between hosts via a router. It is implemented in Python and uses threading to simulate concurrent packet generation, sending, receiving, and routing.
+This project is a simulation of a network with two hosts, a router, and two links. It is written in Python and uses the TOML configuration file format for setting up the parameters of the simulation.
 
-## Project Structure
+## Getting Started
 
-The project is structured into several Python files and a configuration file:
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 
-- `main.py`: This is the entry point of the application. It sets up the hosts, router, and links based on the configuration file. It also starts the threads for packet generation, sending, receiving, and routing.
+### Prerequisites
 
-- `router.py`: This file contains the `Router` class which simulates a router. The router receives packets from a host, queues them if there is enough space, and sends them to another host.
+- Python 3.11
+- TOML 0.10.2
 
-- `link.py`: This file contains the `Link` class which simulates a link between a host and a router or between a router and a host. It calculates the propagation and transmission times based on the link's distance, speed, and debit.
+### Installing
 
-- `case1.toml`: This is the configuration file for the simulation. It specifies the rate of packet generation, the queue size of the router, the debit and distance of the links, the number of packets to send, and the speed of propagation.
-
-## Running the Simulation
-
-To run the simulation, simply execute the `main.py` file:
+Clone the repository to your local machine:
 
 ```bash
-python main.py
+git clone https://github.com/huwa1105/QueueingModel.git
 ```
 
-The simulation will then start and print out the progress of packet generation, sending, receiving, and routing. At the end, it will print out the details of all packets, including their order, start and end times at the hosts and the router, their position in the queue, and whether they were dropped.
+Navigate to the project source directory:
 
-## Configuration
+```
+cd QueuingModel/src
+```
 
-You can adjust the parameters of the simulation by editing the `case1.toml` file. Here is what each parameter means:  
+Install the required Python packages:
 
-- `rate`: The number of packets generated per second.
-- `queue_size`: The size of the router's queue in octets.
-- `debit_link_1` and `debit_link_2`: The debit of the links in bits/s.
-- `distance_link_1` and `distance_link_2`: The distance of the links in meters.
-- `number_of_packets`: The number of packets to send in the simulation.
-- `speed`: The speed of propagation in bits/s (2/3 of the speed of light).
+```
+pip install -r requirements.txt
+```
 
-Please note that the simulation assumes that all packets have a size of 1000 octets.
+### Running the Simulation
+To run the simulation, execute the following command:
+
+```
+python main.py -c example.toml
+```
+
+You can replace `example.toml` with the path to any other TOML configuration file.
+
+### Configuration
+The configuration file is written in the TOML format. The following is an example configuration file:
+
+```toml
+[parameter]
+rate = 50 #number of packets per second (-1 = unlimited)
+queue_size = 1000 #size of the queue in octets
+debit_link_1 = 1000 #bits/s
+distance_link_1 = 200000 #distance in meters
+debit_link_2 = 500 #bits/s
+distance_link_2 = 400000 #distance in meters
+number_of_packets = 50 #number of packets to send
+speed = 200000 #bits/s (2/3 of speed of light)
+```
+
+### Authors
+- [Hugo Walem](https://moodle.umons.ac.be/user/view.php?id=57125&course=176) - [✉️ hugo.walem@student.umons.ac.be](mailto:hugo.walem@student.umons.ac.be)
+- [Cyril Tongres](https://moodle.umons.ac.be/user/view.php?id=55192&course=176) - [✉️ cyril.tongres@student.umons.ac.be](mailto:cyril.tongres@student.umons.ac.be)
+
+### License
+No license

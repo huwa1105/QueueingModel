@@ -1,8 +1,8 @@
-import os
 import time
 import threading
 import logging
 import toml
+import argparse
 
 from router import Router
 from link import Link
@@ -10,12 +10,13 @@ from host import Host
 from packet import Packet
 
 
-# TODO Assure sync for shared list between threads
-
-
 def main():
 
-    config_file = "case1.toml"
+    parser = argparse.ArgumentParser(prog="Queueing Model", description="Simulate a network with 2 hosts, a router and 2 link")
+    parser.add_argument("-c", "--config", help="Path to the config file", default="example.toml")
+    args = parser.parse_args()
+
+    config_file = args.config
 
     with open(config_file, "r") as f:
         config = toml.load(f)
@@ -53,11 +54,16 @@ def main():
     def generate_packet():
         global flag
         for i in range(0, int(config['parameter']['number_of_packets'])):
+            if rate > 0:
+                time.sleep(1 / rate)
+            elif rate == 0:
+                logging.error("Rate cannot be 0")
+                exit(1)
+
             packet = Packet(order=i, size=1000, dropped=False)
             event_list.append(packet)
-            time.sleep(1 / rate)
 
-        #print("\nAll packets have been generated\n")
+        # print("\nAll packets have been generated\n")
         flag = True
 
     t_packet = threading.Thread(target=generate_packet, name="packet_generation")
