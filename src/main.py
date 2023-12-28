@@ -24,7 +24,7 @@ def main():
     # Util_variables
     event_list = []
     all_packets_result = []
-    rate: int = int(config['parameter']['rate'])  # packets per second
+    rate: str = config['parameter']['rate']  # packets per second
     global flag
     flag = False
 
@@ -53,15 +53,41 @@ def main():
     # Packets generation
     def generate_packet():
         global flag
-        for i in range(0, int(config['parameter']['number_of_packets'])):
-            if rate > 0:
-                time.sleep(1 / rate)
-            elif rate == 0:
-                logging.error("Rate cannot be 0")
-                exit(1)
 
-            packet = Packet(order=i, size=1000, dropped=False)
-            event_list.append(packet)
+        if float(rate) == rate:
+
+            new_rate = float(rate)
+
+            print(f"\n{rate} packets per second")
+
+            for i in range(0, int(config['parameter']['number_of_packets'])):
+                if new_rate > 0:
+                    time.sleep(1 / new_rate)
+                elif rate == 0:
+                    logging.error("Rate cannot be 0")
+                    exit(1)
+
+                packet = Packet(order=i, size=1000, dropped=False)
+                event_list.append(packet)
+                # print(f"\nPacket {packet} generated")
+
+        else:
+
+            new_rate = rate.split("_")
+
+            packets_per_burst = int(new_rate[0])
+            delay_between_burst = int(new_rate[1])
+
+            print(f"\nBurst of {packets_per_burst} packets every {delay_between_burst} seconds")
+
+            for i in range(0, int(config['parameter']['number_of_packets'])):
+
+                if i % packets_per_burst == 0 and i != 0:
+                    time.sleep(delay_between_burst)
+
+                packet = Packet(order=i, size=1000, dropped=False)
+                event_list.append(packet)
+                # print(f"\nPacket {packet} generated")
 
         # print("\nAll packets have been generated\n")
         flag = True
@@ -78,7 +104,7 @@ def main():
                 sent_packet = hostA.send(sent_packet, linkAR)
                 # print(f"\nPacket {sent_packet} sent by host")
                 sent_packets_linkAR.append(sent_packet)
-        print(f"\nAll packets have been sent by host {cmpt}")
+        # print(f"\nAll packets have been sent by host {cmpt}")
 
     def router_recv_packet():
         cmpt = 0
@@ -90,7 +116,7 @@ def main():
                 if dropped_packet:
                     all_packets_result.append(dropped_packet)
                 # print(f"\nPacket {received_packet} received by router")
-        print(f"\nAll packets have been received by router {cmpt}")
+        # print(f"\nAll packets have been received by router {cmpt}")
 
 
     def router_send_packet():
@@ -102,7 +128,7 @@ def main():
                 sent_packet = router.send(sent_packet, linkRB)
                 # print(f"\nPacket {sent_packet} sent by router")
                 sent_packets_linkRB.append(sent_packet)
-        print(f"\nAll packets have been sent by router {cmpt}")
+        # print(f"\nAll packets have been sent by router {cmpt}")
 
 
     def host_recv_packet():

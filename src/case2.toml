@@ -1,5 +1,5 @@
 [parameter]
-rate = 2000
+rate = 2
 queue_size = 1000
 debit_link_1 = 1000
 distance_link_1 = 200000

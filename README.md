@@ -45,7 +45,7 @@ The configuration file is written in the TOML format. The following is an exampl
 
 ```toml
 [parameter]
-rate = 50 #number of packets per second (-1 = unlimited)
+rate = 50 #number of packets per second (-1 = unlimited) or "[int1]_[int2]" for burst of int1 packets every int2 seconds
 queue_size = 1000 #size of the queue in octets
 debit_link_1 = 1000 #bits/s
 distance_link_1 = 200000 #distance in meters
