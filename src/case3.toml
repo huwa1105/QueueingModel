@@ -1,0 +1,9 @@
+[parameter]
+rate = 0.5
+queue_size = 1000
+debit_link_1 = 1000
+distance_link_1 = 200000
+debit_link_2 = 500
+distance_link_2 = 400000
+number_of_packets = 30
+speed = 200000

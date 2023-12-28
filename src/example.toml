@@ -1,0 +1,9 @@
+[parameter]
+rate = 50 #number of packets per second (-1 = unlimited) or "[int1]_[int2]" for burst of int1 packets every int2 seconds
+queue_size = 1000 #size of the queue in octets
+debit_link_1 = 1000 #bits/s
+distance_link_1 = 200000 #distance in meters
+debit_link_2 = 500 #bits/s
+distance_link_2 = 400000 #distance in meters
+number_of_packets = 30 #number of packets to send
+speed = 200000 #bits/s (2/3 of speed of light)
