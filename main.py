@@ -57,7 +57,7 @@ def main():
         if float(rate) == rate:
 
             new_rate = float(rate)
-            print(f"\n{rate} packets per second")
+            print(f"Packet generation rate: {rate} packets per second")
 
             for i in range(0, int(config['parameter']['number_of_packets'])):
                 if new_rate > 0:
@@ -77,7 +77,7 @@ def main():
             packets_per_burst = int(new_rate[0])
             delay_between_burst = int(new_rate[1])
 
-            print(f"\nBurst of {packets_per_burst} packets every {delay_between_burst} seconds")
+            print(f"\nPacket generation rate: burst of {packets_per_burst} packets every {delay_between_burst} seconds")
 
             for i in range(0, int(config['parameter']['number_of_packets'])):
 
