@@ -22,7 +22,7 @@ git clone https://github.com/huwa1105/QueueingModel.git
 Navigate to the project source directory:
 
 ```
-cd QueuingModel
+cd QueueingModel
 ```
 
 Install the required Python packages:
